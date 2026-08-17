@@ -1,0 +1,16 @@
+# OS & Editor files
+.DS_Store
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Quickshell / QML cache
+.qmlcache/
+*.qmlc
+*.jsc
+
+# Test / debug logs
+*.log
+*.qslog

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "omarchy-favorite-folders",
+  "name": "Favorite Folders",
+  "version": "1.0.0",
+  "author": "MrDemonc",
+  "license": "MIT",
+  "homepage": "https://github.com/MrDemonc/omarchy-favorite-folders",
+  "description": "Omarchy popup bar widget to manage and quickly open favorite folder shortcuts in your default file manager",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "FavoriteFolders.qml"
+  },
+  "barWidget": {
+    "displayName": "Favorite Folders",
+    "description": "Click to open popup with favorite folder shortcuts, add, edit, and delete folder routes.",
+    "category": "Utilities",
+    "defaultSection": "right",
+    "allowMultiple": false
+  }
+}
