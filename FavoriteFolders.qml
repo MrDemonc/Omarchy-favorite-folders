@@ -173,6 +173,16 @@ BarWidget {
     }
   }
 
+  function setFormValues(path, name) {
+    var p = path || ""
+    var n = name || ""
+    root.inputPath = p
+    root.inputName = n
+    if (pathInputField) pathInputField.text = p
+    if (nameInputField) nameInputField.text = n
+    root.formError = ""
+  }
+
   function close() {
     if (root.isBrowsing) {
       root.popupOpen = false
@@ -183,10 +193,7 @@ BarWidget {
     root.formError = ""
     root.deleteTarget = null
     root.editingId = ""
-    root.inputPath = ""
-    root.inputName = ""
-    if (pathInputField) pathInputField.text = ""
-    if (nameInputField) nameInputField.text = ""
+    root.setFormValues("", "")
   }
 
   function openFolder(path) {
@@ -205,11 +212,7 @@ BarWidget {
 
   function openAddForm() {
     root.editingId = ""
-    root.inputPath = ""
-    root.inputName = ""
-    if (pathInputField) pathInputField.text = ""
-    if (nameInputField) nameInputField.text = ""
-    root.formError = ""
+    root.setFormValues("", "")
     root.viewState = "form"
     Qt.callLater(function() {
       if (pathInputField) pathInputField.forceActiveFocus()
@@ -219,11 +222,7 @@ BarWidget {
   function openEditForm(folder) {
     if (!folder) return
     root.editingId = folder.id
-    root.inputPath = folder.path
-    root.inputName = folder.name
-    if (pathInputField) pathInputField.text = folder.path
-    if (nameInputField) nameInputField.text = folder.name
-    root.formError = ""
+    root.setFormValues(folder.path, folder.name)
     root.viewState = "form"
     Qt.callLater(function() {
       if (pathInputField) pathInputField.forceActiveFocus()
@@ -277,10 +276,7 @@ BarWidget {
     root.viewState = "list"
     root.formError = ""
     root.editingId = ""
-    root.inputPath = ""
-    root.inputName = ""
-    if (pathInputField) pathInputField.text = ""
-    if (nameInputField) nameInputField.text = ""
+    root.setFormValues("", "")
   }
 
   function promptDelete(folder) {
@@ -308,10 +304,7 @@ BarWidget {
     root.formError = ""
     root.editingId = ""
     root.deleteTarget = null
-    root.inputPath = ""
-    root.inputName = ""
-    if (pathInputField) pathInputField.text = ""
-    if (nameInputField) nameInputField.text = ""
+    root.setFormValues("", "")
   }
 
   // Sizing on the bar
@@ -750,11 +743,15 @@ BarWidget {
                 text: root.inputPath
                 placeholderText: "e.g. ~/Documents/Projects or /var/log"
                 onTextChanged: {
-                  root.inputPath = text
-                  if (root.inputName.trim() === "" && text.trim() !== "") {
-                    root.inputName = FoldersHelper.extractFolderName(text)
+                  if (root.inputPath !== text) {
+                    root.inputPath = text
+                    if (root.inputName.trim() === "" && text.trim() !== "") {
+                      var autoName = FoldersHelper.extractFolderName(text)
+                      root.inputName = autoName
+                      if (nameInputField) nameInputField.text = autoName
+                    }
+                    root.formError = ""
                   }
-                  root.formError = ""
                 }
                 onAccepted: root.saveForm()
               }
@@ -793,8 +790,10 @@ BarWidget {
               text: root.inputName
               placeholderText: "Leave blank to auto-detect from path"
               onTextChanged: {
-                root.inputName = text
-                root.formError = ""
+                if (root.inputName !== text) {
+                  root.inputName = text
+                  root.formError = ""
+                }
               }
               onAccepted: root.saveForm()
             }
@@ -818,22 +817,23 @@ BarWidget {
 
               Repeater {
                 model: [
-                  { name: "Home", path: "~" },
-                  { name: "Documents", path: "~/Documents" },
-                  { name: "Downloads", path: "~/Downloads" },
-                  { name: "Projects", path: "~/Documents/Proyects" },
-                  { name: "Pictures", path: "~/Pictures" }
+                  { name: "Home", path: "~", icon: "󰋜" },
+                  { name: "Documents", path: "~/Documents", icon: "󰈙" },
+                  { name: "Downloads", path: "~/Downloads", icon: "󰉏" },
+                  { name: "Projects", path: "~/Documents/Proyects", icon: "󰲋" },
+                  { name: "Pictures", path: "~/Pictures", icon: "󰉐" },
+                  { name: "Videos", path: "~/Videos", icon: "󰉓" },
+                  { name: "Music", path: "~/Music", icon: "󰉑" }
                 ]
 
                 delegate: Button {
                   required property var modelData
+                  iconText: modelData.icon || "󰉋"
                   text: modelData.name
                   bordered: true
                   fontSize: Style.font.caption
                   onClicked: {
-                    root.inputPath = modelData.path
-                    root.inputName = modelData.name
-                    root.formError = ""
+                    root.setFormValues(modelData.path, modelData.name)
                   }
                 }
               }
